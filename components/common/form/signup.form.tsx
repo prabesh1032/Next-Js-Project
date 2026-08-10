@@ -1,78 +1,83 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import type { SubmitHandler } from 'react-hook-form'
 import Input from '@/components/common/ui/input'
 import Button from '@/components/common/ui/button'
 
+type SignupFormValues = {
+  name: string
+  email: string
+  password: string
+  confirmPassword: string
+}
+
 export default function SignupForm() {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState('')
+  const {
+    formState: { errors },
+    getValues,
+    handleSubmit,
+    register,
+  } = useForm<SignupFormValues>()
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    if (!name || !email || !password || !confirmPassword) {
-      setMessage('Complete all fields to create your account.')
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setMessage('Passwords do not match.')
-      return
-    }
-
+  const onSubmit: SubmitHandler<SignupFormValues> = (data) => {
+    console.log('Registration data:', data)
     setMessage('Your account details are ready to be connected to the auth service.')
   }
 
   return (
-    <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+    <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
       <Input
         autoComplete="name"
         id="name"
         label="Full name"
         name="name"
-        onChange={(event) => setName(event.target.value)}
         placeholder="Your full name"
-        required
+        {...register('name', { required: 'Full name is required.' })}
         type="text"
-        value={name}
       />
+      {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name.message}</p>}
       <Input
         autoComplete="email"
         id="email"
         label="Email address"
         name="email"
-        onChange={(event) => setEmail(event.target.value)}
         placeholder="you@example.com"
-        required
+        {...register('email', {
+          required: 'Email address is required.',
+          pattern: { value: /\S+@\S+\.\S+/, message: 'Enter a valid email address.' },
+        })}
         type="email"
-        value={email}
       />
+      {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
       <Input
         autoComplete="new-password"
         id="password"
         label="Password"
         name="password"
-        onChange={(event) => setPassword(event.target.value)}
         placeholder="Create a password"
-        required
+        {...register('password', {
+          required: 'Password is required.',
+          minLength: { value: 8, message: 'Password must be at least 8 characters.' },
+        })}
         type="password"
-        value={password}
       />
+      {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
       <Input
         autoComplete="new-password"
         id="confirm-password"
         label="Confirm password"
         name="confirm-password"
-        onChange={(event) => setConfirmPassword(event.target.value)}
         placeholder="Repeat your password"
-        required
+        {...register('confirmPassword', {
+          required: 'Please confirm your password.',
+          validate: (value) => value === getValues('password') || 'Passwords do not match.',
+        })}
         type="password"
-        value={confirmPassword}
       />
+      {errors.confirmPassword && <p className="mt-2 text-sm text-red-600">{errors.confirmPassword.message}</p>}
 
       <Button type="submit">
         Create account

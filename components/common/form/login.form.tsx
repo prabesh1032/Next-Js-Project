@@ -1,40 +1,42 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
 import Input from '@/components/common/ui/input'
 import Button from '@/components/common/ui/button'
 
+type LoginFormValues = {
+  email: string
+  password: string
+  rememberMe: boolean
+}
+
 export default function LoginForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
   const [message, setMessage] = useState('')
+  const {
+    formState: { errors },
+    handleSubmit,
+    register,
+  } = useForm<LoginFormValues>()
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    if (!email || !password) {
-      setMessage('Enter your email and password to continue.')
-      return
-    }
-
+  function onSubmit(data: LoginFormValues) {
+    console.log('Login data:', data)
     setMessage('Your sign-in details are ready to be connected to the auth service.')
   }
 
   return (
-    <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+    <form className="mt-8 space-y-5" onSubmit={handleSubmit(onSubmit)}>
       <div>
         <Input
           autoComplete="email"
           id="email"
+          name='email'
           label="Email address"
-          name="email"
-          onChange={(event) => setEmail(event.target.value)}
           placeholder="you@example.com"
-          required
+          {...register('email', { required: 'Email address is required.' })}
           type="email"
-          value={email}
         />
+        {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email.message}</p>}
       </div>
 
       <div>
@@ -46,21 +48,19 @@ export default function LoginForm() {
         <Input
           autoComplete="current-password"
           id="password"
+          name='password'
           label="Password"
-          name="password"
-          onChange={(event) => setPassword(event.target.value)}
           placeholder="Enter your password"
-          required
+          {...register('password', { required: 'Password is required.' })}
           type="password"
-          value={password}
         />
+        {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password.message}</p>}
       </div>
 
       <label className="flex cursor-pointer items-center gap-3 text-sm text-slate-600">
         <input
-          checked={rememberMe}
           className="h-4 w-4 rounded border-slate-300 text-indigo-600 accent-indigo-600 focus:ring-indigo-500"
-          onChange={(event) => setRememberMe(event.target.checked)}
+          {...register('rememberMe')}
           type="checkbox"
         />
         Remember me for 30 days
