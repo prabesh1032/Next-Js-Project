@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react'
 import Input from '@/components/common/ui/input'
+import Button from '@/components/common/ui/button'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
@@ -65,12 +66,9 @@ export default function LoginForm() {
         Remember me for 30 days
       </label>
 
-      <button
-        className="w-full rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/20 transition hover:bg-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-500/25 active:scale-[.99]"
-        type="submit"
-      >
+      <Button type="submit">
         Sign in
-      </button>
+      </Button>
 
       <p aria-live="polite" className="min-h-5 text-center text-sm text-slate-500">
         {message}
